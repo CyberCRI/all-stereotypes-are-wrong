@@ -1,5 +1,7 @@
 'use strict';
 
+//require("/Users/himmelattack/projects/cri/all-stereotypes-are-wrong/node_modules/font-awesome/css/font-awesome.css");
+
 const Chart = require('chart.js');
 Chart.defaults.global.legend.display = false;
 Chart.defaults.global.tooltips.enabled = false;
