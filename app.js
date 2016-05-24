@@ -25,15 +25,23 @@ mongoose.connect(mongo_url);
 process.stdout.write(`Mongoose connected to ${mongo_url}\n`);
 
 app.get('/couples', function(request, response) {
+  // Get 20 random couples of terms
+  const pairs = couples.getRandomSet(20);
 
-  const couple1 = couples.getRandom();
-  const couple2 = couples.getRandom(couple1);
+  // Pair them into combincations and create a token for each
+  let questionPromises = [];
+  for(let i = 0; i < pairs.length; i+=2) {
+    const combination = getCombinationId(pairs[i].id, pairs[i+1].id);
+    const token = new Token({ combination: combination });
 
-  const combination = getCombinationId(couple1.id, couple2.id);
-  const token       = new Token({ combination: combination });
+    var questionPromise = token.save().then(function(token) { 
+      return {couples: [pairs[i], pairs[i+1]], token: token.token };
+    });
+    questionPromises.push(questionPromise);
+  }
 
-  token.save().then(function(token) {
-    response.json({ couples: [couple1, couple2], token: token.token });
+  Promise.all(questionPromises).then(function(questions) {
+    response.json(questions);
   });
 });
 

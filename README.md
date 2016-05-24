@@ -1,6 +1,6 @@
-# All Stereotypes Are Wrong
+# Beliefs and Stereotypes - India Edition
 
-**All Stereotypes Are Wrong** was made in 48 hours by 
+**Beliefs and Stereotypes - India Edition** is a fork of **All Stereotypes Are Wrong**, which was made in 48 hours by 
 [Alexis Moroz](https://www.linkedin.com/in/alexismoroz) (game design) & 
 [Clément Bourgoin](https://twitter.com/ClementBourgoin) (code) during the 
 Diversity Jam (April 15-17, 2016) hosted at Mozilla Paris.

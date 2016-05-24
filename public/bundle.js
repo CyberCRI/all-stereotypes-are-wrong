@@ -54,6 +54,8 @@
 	Chart.defaults.global.legend.display = false;
 	Chart.defaults.global.tooltips.enabled = false;
 
+	var questionSet = null;
+
 	var session = {
 	  round: 0,
 	  score: 0
@@ -195,76 +197,78 @@
 	  window.setTimeout(function () {
 	    line.style.marginTop = 0;
 	    window.setTimeout(function () {
-	      getQuestion();
+	      getQuestionSet().then(getQuestion);
 	    }, 1000);
 	  }, 1000);
 	}
 
-	function getQuestion() {
-
-	  fetch('/couples').then(function (response) {
+	function getQuestionSet() {
+	  return fetch('/couples').then(function (response) {
 	    return response.json();
 	  }).then(function (json) {
-
-	    incrementRound();
-
-	    var couples = json.couples;
-	    var token = json.token;
-	    var couple1 = couples[0].id;
-	    var termA = couples[0].firstTerm.en;
-	    var termB = couples[0].secondTerm.en;
-	    var couple2 = couples[1].id;
-	    var term1 = couples[1].firstTerm.en;
-	    var term2 = couples[1].secondTerm.en;
-
-	    var currentLine = document.querySelector('.current.line');
-	    var termsElement = currentLine.querySelector('.terms');
-
-	    termsElement.innerHTML = renderTerms([termA, termB, term1, term2]);
-
-	    var leftZone = document.createElement('div');
-	    leftZone.id = 'leftZone';
-	    leftZone.classList.add('zone');
-	    termsElement.appendChild(leftZone);
-
-	    var rightZone = document.createElement('div');
-	    rightZone.id = 'rightZone';
-	    rightZone.classList.add('zone');
-	    termsElement.appendChild(rightZone);
-
-	    leftZone.addEventListener('mouseenter', function () {
-	      termsElement.classList.add('leftChoice');
-	    });
-	    rightZone.addEventListener('mouseenter', function () {
-	      termsElement.classList.add('rightChoice');
-	    });
-
-	    leftZone.addEventListener('mouseleave', function () {
-	      termsElement.classList.remove('leftChoice');
-	    });
-	    rightZone.addEventListener('mouseleave', function () {
-	      termsElement.classList.remove('rightChoice');
-	    });
-
-	    leftZone.addEventListener('click', function () {
-	      sendAnswer([termA, termB, term1, term2], 'left', couple1, couple2, token);
-	    });
-	    rightZone.addEventListener('click', function () {
-	      sendAnswer([termA, termB, term1, term2], 'right', couple1, couple2, token);
-	    });
-
-	    currentLine.classList.add('animated');
-	    window.setTimeout(function () {
-	      currentLine.style.marginTop = 0;
-	      currentLine.style.opacity = 1;
-
-	      termsElement.classList.remove('leftChoice');
-	      termsElement.classList.remove('rightChoice');
-	      window.setTimeout(function () {
-	        currentLine.classList.remove('animated');
-	      }, 1000);
-	    }, 1000);
+	    questionSet = json;
 	  });
+	}
+
+	function getQuestion() {
+	  incrementRound();
+
+	  var couples = questionSet[session.round - 1].couples;
+	  var token = questionSet[session.round - 1].token;
+	  var couple1 = couples[0].id;
+	  var termA = couples[0].firstTerm.en;
+	  var termB = couples[0].secondTerm.en;
+	  var couple2 = couples[1].id;
+	  var term1 = couples[1].firstTerm.en;
+	  var term2 = couples[1].secondTerm.en;
+
+	  var currentLine = document.querySelector('.current.line');
+	  var termsElement = currentLine.querySelector('.terms');
+
+	  termsElement.innerHTML = renderTerms([termA, termB, term1, term2]);
+
+	  var leftZone = document.createElement('div');
+	  leftZone.id = 'leftZone';
+	  leftZone.classList.add('zone');
+	  termsElement.appendChild(leftZone);
+
+	  var rightZone = document.createElement('div');
+	  rightZone.id = 'rightZone';
+	  rightZone.classList.add('zone');
+	  termsElement.appendChild(rightZone);
+
+	  leftZone.addEventListener('mouseenter', function () {
+	    termsElement.classList.add('leftChoice');
+	  });
+	  rightZone.addEventListener('mouseenter', function () {
+	    termsElement.classList.add('rightChoice');
+	  });
+
+	  leftZone.addEventListener('mouseleave', function () {
+	    termsElement.classList.remove('leftChoice');
+	  });
+	  rightZone.addEventListener('mouseleave', function () {
+	    termsElement.classList.remove('rightChoice');
+	  });
+
+	  leftZone.addEventListener('click', function () {
+	    sendAnswer([termA, termB, term1, term2], 'left', couple1, couple2, token);
+	  });
+	  rightZone.addEventListener('click', function () {
+	    sendAnswer([termA, termB, term1, term2], 'right', couple1, couple2, token);
+	  });
+
+	  currentLine.classList.add('animated');
+	  window.setTimeout(function () {
+	    currentLine.style.marginTop = 0;
+	    currentLine.style.opacity = 1;
+
+	    termsElement.classList.remove('leftChoice');
+	    termsElement.classList.remove('rightChoice');
+	    window.setTimeout(function () {
+	      currentLine.classList.remove('animated');
+	    }, 1000);
+	  }, 1000);
 	}
 
 	function incrementRound() {
@@ -274,9 +278,9 @@
 	}
 
 	document.addEventListener('DOMContentLoaded', function () {
-
-	  getQuestion();
 	  getStats();
+
+	  getQuestionSet().then(getQuestion);
 	});
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 

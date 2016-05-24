@@ -6,6 +6,8 @@ const Chart = require('chart.js');
 Chart.defaults.global.legend.display = false;
 Chart.defaults.global.tooltips.enabled = false;
 
+let questionSet = null;
+
 const session = {
   round: 0,
   score: 0
@@ -157,79 +159,79 @@ function addFinalScore() {
   window.setTimeout(function() {
     line.style.marginTop = 0;
     window.setTimeout(function() {
-      getQuestion();
+      getQuestionSet().then(getQuestion)
     }, 1000);
   }, 1000);
 }
 
+function getQuestionSet() {
+  return fetch('/couples')
+  .then(function(response) {
+    return response.json();
+  }).then(function(json) {
+    questionSet = json;
+  });
+}
+
 function getQuestion() {
+  incrementRound();
 
-  fetch('/couples')
-    .then(function(response) {
-      return response.json();
-    }).then(function(json) {
+  const couples = questionSet[session.round - 1].couples;
+  const token   = questionSet[session.round - 1].token;
+  const couple1 = couples[0].id;
+  const termA   = couples[0].firstTerm.en;
+  const termB   = couples[0].secondTerm.en;
+  const couple2 = couples[1].id;
+  const term1   = couples[1].firstTerm.en;
+  const term2   = couples[1].secondTerm.en;
 
-      incrementRound();
+  const currentLine = document.querySelector('.current.line');
+  const termsElement = currentLine.querySelector('.terms');
 
-      const couples = json.couples;
-      const token   = json.token;
-      const couple1 = couples[0].id;
-      const termA   = couples[0].firstTerm.en;
-      const termB   = couples[0].secondTerm.en;
-      const couple2 = couples[1].id;
-      const term1   = couples[1].firstTerm.en;
-      const term2   = couples[1].secondTerm.en;
+  termsElement.innerHTML = renderTerms([termA, termB, term1, term2]);
 
-      const currentLine = document.querySelector('.current.line');
-      const termsElement = currentLine.querySelector('.terms');
+  const leftZone = document.createElement('div');
+  leftZone.id = 'leftZone';
+  leftZone.classList.add('zone');
+  termsElement.appendChild(leftZone);
 
-      termsElement.innerHTML = renderTerms([termA, termB, term1, term2]);
+  const rightZone = document.createElement('div');
+  rightZone.id = 'rightZone';
+  rightZone.classList.add('zone');
+  termsElement.appendChild(rightZone);
 
-      const leftZone = document.createElement('div');
-      leftZone.id = 'leftZone';
-      leftZone.classList.add('zone');
-      termsElement.appendChild(leftZone);
+  leftZone.addEventListener('mouseenter', function() {
+    termsElement.classList.add('leftChoice');
+  });
+  rightZone.addEventListener('mouseenter', function() {
+    termsElement.classList.add('rightChoice');
+  });
 
-      const rightZone = document.createElement('div');
-      rightZone.id = 'rightZone';
-      rightZone.classList.add('zone');
-      termsElement.appendChild(rightZone);
+  leftZone.addEventListener('mouseleave', function() {
+    termsElement.classList.remove('leftChoice');
+  });
+  rightZone.addEventListener('mouseleave', function() {
+    termsElement.classList.remove('rightChoice');
+  });
 
-      leftZone.addEventListener('mouseenter', function() {
-        termsElement.classList.add('leftChoice');
-      });
-      rightZone.addEventListener('mouseenter', function() {
-        termsElement.classList.add('rightChoice');
-      });
+  leftZone.addEventListener('click', function() {
+    sendAnswer([termA, termB, term1, term2], 'left', couple1, couple2, token);
+  });
+  rightZone.addEventListener('click', function() {
+    sendAnswer([termA, termB, term1, term2], 'right', couple1, couple2, token);
+  });
 
-      leftZone.addEventListener('mouseleave', function() {
-        termsElement.classList.remove('leftChoice');
-      });
-      rightZone.addEventListener('mouseleave', function() {
-        termsElement.classList.remove('rightChoice');
-      });
+  currentLine.classList.add('animated');
+  window.setTimeout(function () {
+    currentLine.style.marginTop = 0;
+    currentLine.style.opacity = 1;
 
-      leftZone.addEventListener('click', function() {
-        sendAnswer([termA, termB, term1, term2], 'left', couple1, couple2, token);
-      });
-      rightZone.addEventListener('click', function() {
-        sendAnswer([termA, termB, term1, term2], 'right', couple1, couple2, token);
-      });
-
-      currentLine.classList.add('animated');
-      window.setTimeout(function () {
-        currentLine.style.marginTop = 0;
-        currentLine.style.opacity = 1;
-
-        termsElement.classList.remove('leftChoice');
-        termsElement.classList.remove('rightChoice');
-        window.setTimeout(function() {
-          currentLine.classList.remove('animated');
-        }, 1000);
-      }, 1000);
-
-
-    });
+    termsElement.classList.remove('leftChoice');
+    termsElement.classList.remove('rightChoice');
+    window.setTimeout(function() {
+      currentLine.classList.remove('animated');
+    }, 1000);
+  }, 1000);
 }
 
 function incrementRound() {
@@ -239,8 +241,7 @@ function incrementRound() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-
-  getQuestion();
   getStats();
 
+  getQuestionSet().then(getQuestion);
 });

@@ -1,5 +1,7 @@
 'use strict';
 
+const _ = require("lodash");
+
 const Term = function(en, fr) {
   // Currently only EN is used
   this.en = en;
@@ -45,6 +47,9 @@ CoupleManager.prototype = {
       }
     }
     return false;
+  },
+  getRandomSet: function(n) {
+    return _.chain(this.couples).shuffle().take(n).value();
   }
 }
 
@@ -67,7 +72,18 @@ let pairs = [
   ["supersticious", "scientific"],
   ["caring", "hurtful"],
   ["short-tempered", "patient"],
-  ["strong", "weak"]
+  ["strong", "weak"],
+  ["hindu", "muslim"],
+  ["congress", "bjp"],
+  ["cricket", "football"],
+  ["shah rukh khan", "rajinikanth"],
+  ["spicy", "sweet"],
+  ["young", "old"],
+  ["dalit", "pundit"],
+  ["married", "single"],
+  ["coca-cola", "sherbet"],
+  ["pizza", "uthappam"],
+  ["dirty", "single"]
 ];
 
 for(const pair of pairs) {
