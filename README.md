@@ -13,8 +13,12 @@ Install Node.js & MongoDB
 
 ```
 $ git clone https://github.com/iwazaru/all-stereotypes-are-wrong.git
+$ cd all-stereotypes-are-wrong
 $ npm install
+$ npm start
 ```
+
+Then visit [http://localhost:3000](http://localhost:3000) to play. 
 
 ## Todo
 
