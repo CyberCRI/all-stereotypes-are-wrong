@@ -83,7 +83,7 @@ let pairs = [
   ["married", "single"],
   ["coca-cola", "sherbet"],
   ["pizza", "uthappam"],
-  ["dirty", "single"]
+  ["dirty", "clean"]
 ];
 
 for(const pair of pairs) {
