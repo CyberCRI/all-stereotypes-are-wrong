@@ -19,3 +19,8 @@ $ npm start
 ```
 
 Then visit [http://localhost:3000](http://localhost:3000) to play. 
+
+## Configuration
+
+To change the port or the MongoDB database, use the `PORT` and `MONGO_URL` set the environmental variables. See `app.js` for more details.
+ 
